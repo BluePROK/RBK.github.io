@@ -4,12 +4,12 @@
 
     
   <url>
-    <loc>https://bluerbk.top/2018/03/25/CSharp-Third-Teaching/</loc>
-    <lastmod>2018-03-25T14:29:09.008Z</lastmod>
+    <loc>https://bluerbk.top/2018/03/18/CSharp-Forth-Teaching/</loc>
+    <lastmod>2018-04-07T06:39:50.270Z</lastmod>
     <data>
         <display>
-        <title>C#基础伪教程（三）</title>
-        <pubTime>2018-03-25T11:48:38.000Z</pubTime>
+        <title>C#基础伪教程（四）内置类</title>
+        <pubTime>2018-03-18T08:53:09.000Z</pubTime>
         
         <tag>编程</tag>
          
@@ -31,7 +31,7 @@
     
   <url>
     <loc>https://bluerbk.top/2018/03/23/aircrack-and-ali-s-oss/</loc>
-    <lastmod>2018-03-23T16:18:07.927Z</lastmod>
+    <lastmod>2018-04-06T08:46:09.976Z</lastmod>
     <data>
         <display>
         <title>使用aircrack进行WiFi监听和密码破解以及在Markdown插入图片</title>
@@ -49,6 +49,32 @@
            
              
               <breadCrumb title="无线安全" url="https://bluerbk.top/categories/%E6%97%A0%E7%BA%BF%E5%AE%89%E5%85%A8/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://bluerbk.top/2018/03/25/CSharp-Third-Teaching/</loc>
+    <lastmod>2018-03-25T14:29:09.008Z</lastmod>
+    <data>
+        <display>
+        <title>C#基础伪教程（三）</title>
+        <pubTime>2018-03-25T11:48:38.000Z</pubTime>
+        
+        <tag>编程</tag>
+         
+        <tag>C#</tag>
+         
+        <tag>dotnet</tag>
+         
+        <tag>Microsoft</tag>
+         
+         
+           
+             
+              <breadCrumb title="C#" url="https://bluerbk.top/categories/C/"/>
           
         </display>
     </data>
