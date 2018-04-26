@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://bluerbk.top/"/>
-  <updated>2018-04-24T11:21:01.443Z</updated>
+  <updated>2018-04-26T15:12:30.640Z</updated>
   <id>https://bluerbk.top/</id>
   
   <author>
@@ -15,6 +15,69 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Python从入门到放弃：利用爬虫抓取文字和图片</title>
+    <link href="https://bluerbk.top/2018/04/26/Python-WebBug-First/"/>
+    <id>https://bluerbk.top/2018/04/26/Python-WebBug-First/</id>
+    <published>2018-04-26T11:05:51.000Z</published>
+    <updated>2018-04-26T15:12:30.640Z</updated>
+    
+    <content type="html"><![CDATA[<p>在别提今天了，下午睡了至少三四个小时，看这个文章的建立时间，这不我才睡醒。写完这个得去写作业了，然后呢，有空了或者五一之后把网络编程看一看，就要去攻项目了。<br>具体深入的我不说，我也不知道，概念我也不知道，我就会用，就这么耿直。先说说爬虫主要import的东西，requests、BeautifulSoup和urllib(3.x里urlib和urllib2合为urllib了)。</p><h2 id="库的介绍"><a href="#库的介绍" class="headerlink" title="库的介绍"></a>库的介绍</h2><h3 id="urllib"><a href="#urllib" class="headerlink" title="urllib"></a>urllib</h3><p>Urllib是python内置的HTTP请求库，3.x版本中urllib2已经被整合到urllib.request里了<br>包括以下模块<br>urllib.request 请求模块<br>urllib.error 异常处理模块<br>urllib.parse url解析模块<br>urllib.robotparser robots.txt解析模块<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">import urllib.request</span><br><span class="line">response = urllib.request.urlopen(&apos;http://www.baidu.com&apos;)</span><br><span class="line">print(response.read().decode(&apos;utf-8&apos;))</span><br><span class="line">//上面是一种，下面是包含header头部信息的方法，防止某些网页反爬虫</span><br><span class="line">headers=&#123;&apos;User-Agent&apos;:&apos;Mozilla/5.0 (Windows NT 6.1; WOW64; rv:59.0) Gecko/20100101 Firefox/59.0&apos;&#125;</span><br><span class="line">req=urllib.request.Request(url,headers=headers)</span><br><span class="line">page=urllib.request.urlopen(req)</span><br><span class="line">soup=bs(content,&apos;html.parser&apos;)</span><br></pre></td></tr></table></figure></p><p>post就不写了，用了再说</p><h3 id="requests"><a href="#requests" class="headerlink" title="requests"></a>requests</h3><p>requests是python实现的简单易用的HTTP库，使用起来比urllib简洁很多。request也称urllib3模块。</p><h3 id="BeautifulSoup"><a href="#BeautifulSoup" class="headerlink" title="BeautifulSoup"></a>BeautifulSoup</h3><p>BeautifulSoup是Python的一个库，最主要的功能就是从网页爬取我们需要的数据。BeautifulSoup将html解析为对象进行处理，全部页面转变为字典或者数组，相对于正则表达式的方式，可以大大简化处理过程。</p><p>我以前在公众号写过一个爬虫的文章。（其实乍一看，微信的排版是真的可以，这个博客还是有点太简约了）<br><a href="https://mp.weixin.qq.com/s/ZooAeS7NgZESvcqf0xveIA" target="_blank" rel="noopener">点击此处跳转</a><br>这是关于新浪新闻内容的爬取，下面说一下关于图片等其他数据的爬取。因为我今天太困了，就不弄下载视屏什么的了。</p><h2 id="利用python爬虫抓取图片"><a href="#利用python爬虫抓取图片" class="headerlink" title="利用python爬虫抓取图片"></a>利用python爬虫抓取图片</h2><p>抓图片重点就是，找到图片所在的链接，就是我每次用极简图床出来的那个连接一样，然后使用request.get(url).content获取图片的二进制信息，然后直接写入本地文件，修改后缀即可。<br>上面新闻的爬取是静态网页，这里我爬王者荣耀官网，下载所有英雄的皮肤图片，他这个就是一个动态网页，什么是动态呢？动态就是说信息不在网页源代码里，而是在加载网页的时候才进行下载的。那么<strong>怎么判断是动态还是静态呢？</strong>有一个简单粗暴的技巧，右键查看网页源代码，ctrl-F搜索关键字，如果搜不出来那就是动态的了。<br>当然动态的其实也不难分析，按F12或者右键审查元素，点击网络栏，然后刷新就会出现收到的包，挨个看找需要的就好了。<br>直接上代码<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">import requests</span><br><span class="line">import json</span><br><span class="line">with open(r&apos;herolist.json&apos;,&apos;r&apos;,encoding=&apos;utf-8&apos;) as f:</span><br><span class="line">jsonFile=json.load(f)</span><br><span class="line">for i in range(0,79):</span><br><span class="line">ename=jsonFile[i][&apos;ename&apos;]</span><br><span class="line">cname=jsonFile[i][&apos;cname&apos;]</span><br><span class="line">skin_name=jsonFile[i][&apos;skin_name&apos;].split(&apos;|&apos;)</span><br><span class="line">skin_name_num=len(skin_name)</span><br><span class="line">for j in range(1,skin_name_num+1):</span><br><span class="line">url=&quot;http://game.gtimg.cn/images/yxzj/img201606/skin/hero-info/&quot;+str(ename)+&quot;/&quot;+str(ename)+&quot;-bigskin-&quot;+str(j)+&quot;.jpg&quot;</span><br><span class="line">html=requests.get(url).content</span><br><span class="line">with open(&quot;F:\\Programming\\Sublime\\Python\\Web_Bug\\Honor\\&quot;+cname+&quot;_&quot;+skin_name[j-1]+&quot;.jpg&quot;,&apos;wb&apos;) as picf:</span><br><span class="line">picf.write(html)</span><br><span class="line">print(&quot;获取英雄 &#123;0&#125; 的皮肤--&#123;1&#125; 成功&quot;.format(cname,skin_name[j-1]))</span><br></pre></td></tr></table></figure></p><p>解释一下以上代码，首先根据上面说的，发现他的数据是一个json格式的文件，然后呢要审查是吧，这就比较坑，360显示不出来，谷歌浏览器乱码，让我专门下了个火狐才能看到正确的，就很坑，如下图。<br><img src="http://my-web-image.oss-cn-beijing.aliyuncs.com/18-4-26/57246599.jpg" alt="image"><br><strong>json文件操作</strong><br>用json.load导入，json其实也算是一个列表，用类似数组的方式访问，对于其中每个属性，用中括号访问即可，用split分割皮肤名，并计数，然后第一个for循环是循环每个英雄，第二个for循环是对每个皮肤进行循环，然后依次构造链接，获取图片信息，写入本地文件，下图是成果。<br><img src="http://my-web-image.oss-cn-beijing.aliyuncs.com/18-4-26/68564150.jpg" alt="image"><br>以下代码是获取静态网页的示例，这里注释的部分是使用urllib库，没注释的用的requests库获取的网页信息，可以都参考一下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">from bs4 import BeautifulSoup as bs</span><br><span class="line">import urllib.request</span><br><span class="line">import requests</span><br><span class="line">for p in range(3,6):</span><br><span class="line">url=&quot;https://www.dbmeinv.com/dbgroup/show.htm?cid=7&amp;pager_offset=&quot;+str(p)</span><br><span class="line">#headers=&#123;&apos;User-Agent&apos;:&apos;Mozilla/5.0 (Windows NT 6.1; WOW64; rv:59.0) Gecko/20100101 Firefox/59.0&apos;&#125;</span><br><span class="line">#req=urllib.request.Request(url,headers=headers)</span><br><span class="line">#page=urllib.request.urlopen(req)</span><br><span class="line">#content=page.read().decode(&apos;utf-8&apos;)</span><br><span class="line">res=requests.get(url)</span><br><span class="line">res.encoding=&apos;utf-8&apos;</span><br><span class="line">#soup=bs(content,&apos;html.parser&apos;)</span><br><span class="line">soup=bs(res.text,&apos;html.parser&apos;)</span><br><span class="line">src=soup.find_all(&apos;img&apos;)</span><br><span class="line">for i in src:</span><br><span class="line">pic_src=requests.get(i[&apos;src&apos;]).content</span><br><span class="line">name=i.get(&apos;title&apos;)</span><br><span class="line">#i.get(&apos;title&apos;)或者i[&apos;title&apos;]都可以</span><br><span class="line">with open(&apos;F:\\Programming\\Sublime\\Python\\Web_Bug\\ttui\\&apos;+name+&apos;.jpg&apos;,&apos;wb&apos;) as f:</span><br><span class="line">f.write(pic_src)</span><br><span class="line">print(name+&quot;\t写入完成&quot;)</span><br></pre></td></tr></table></figure></p><h2 id="OK-THANKS-FOR-READING-BYE-BYE"><a href="#OK-THANKS-FOR-READING-BYE-BYE" class="headerlink" title="OK,THANKS FOR READING.BYE BYE~"></a>OK,THANKS FOR READING.BYE BYE~</h2>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;在别提今天了，下午睡了至少三四个小时，看这个文章的建立时间，这不我才睡醒。写完这个得去写作业了，然后呢，有空了或者五一之后把网络编程看一看，就要去攻项目了。&lt;br&gt;具体深入的我不说，我也不知道，概念我也不知道，我就会用，就这么耿直。先说说爬虫主要import的东西，requ
+      
+    
+    </summary>
+    
+      <category term="Python" scheme="https://bluerbk.top/categories/Python/"/>
+    
+    
+      <category term="编程" scheme="https://bluerbk.top/tags/%E7%BC%96%E7%A8%8B/"/>
+    
+      <category term="Python" scheme="https://bluerbk.top/tags/Python/"/>
+    
+      <category term="网络爬虫" scheme="https://bluerbk.top/tags/%E7%BD%91%E7%BB%9C%E7%88%AC%E8%99%AB/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>C#基础伪教程（五）网络编程</title>
+    <link href="https://bluerbk.top/2018/04/24/CSharp-Seventh-NetConnection/"/>
+    <id>https://bluerbk.top/2018/04/24/CSharp-Seventh-NetConnection/</id>
+    <published>2018-04-24T14:59:42.000Z</published>
+    <updated>2018-04-24T15:11:21.234Z</updated>
+    
+    <content type="html"><![CDATA[<p>高产似那啥，今天可能出不来这个文章了，明天发吧。<br>其实这个不用重点介绍概念什么的了，突然想起来之前写过java的网络编程，可以把这两个文章结合起来看。最后写一个实例是Java和C#进行通信的例子，有GUI的。</p><p>网络编程有UDP啊，TCP啊，喜闻乐见的Socket啊什么的，打算把这些都搞一下，以前一直用java的Socket，也用Socket在Java和C#发送消息，看了看好像C#的TCP不难，那就试试吧，都可以给一个实例的，是实例不是示例。</p><h2 id="Socket"><a href="#Socket" class="headerlink" title="Socket"></a>Socket</h2><p>socket非常类似于电话插座。以一个电话网为例：电话的通话双方相当于相互通信的2个程序，电话号码就是ip地址。任何用户在通话之前，首先要占有一部电话机，相当于申请一个socket；同时要知道对方的号码，相当于对方有一个固定的socket。然后向对方拨号呼叫，相当于发出连接请求。对方假如在场并空闲，拿起电话话筒，双方就可以正式通话，相当于连接成功。双方通话的过程，是一方向电话机发出信号和对方从电话机接收信号的过程，相当于向socket发送数据和从socket接收数据。通话结束后，一方挂起电话机相当于关闭socket，撤销连接。<br>套接字分类</p><ul><li>流式套接字（SOCK_STREAM）：提供了一种可靠的、面向连接的双向数据传输服务。实现了数据无差错，无重复的发送，内设流量控制，被传输的数据被看做无记录边界的字节流。在TCP/IP协议簇中，使用TCP实现字节流的传输，当用户要发送大批量数据，或对数据传输的可靠性有较高要求时使用流式套接字。</li><li>数据报套接字（SOCK_DGRAM）：提供了一种无连接、不可靠的双向数据传输服务。数据以独立的包形式被发送，并且保留了记录边界，不提供可靠性保证。数据在传输过程中可能会丢失或重复，并且不能保证在接收端数据按发送顺序接收。在TCP/IP协议簇中，使用UDP实现数据报套接字。</li><li>原始套接字（SOCK_RAW）：该套接字允许对较低层协议（如IP或ICMP）进行直接访问。一般用于对TCP/IP核心协议的网络编程。</li></ul>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;高产似那啥，今天可能出不来这个文章了，明天发吧。&lt;br&gt;其实这个不用重点介绍概念什么的了，突然想起来之前写过java的网络编程，可以把这两个文章结合起来看。最后写一个实例是Java和C#进行通信的例子，有GUI的。&lt;/p&gt;
+&lt;p&gt;网络编程有UDP啊，TCP啊，喜闻乐见的So
+      
+    
+    </summary>
+    
+      <category term="C#" scheme="https://bluerbk.top/categories/C/"/>
+    
+    
+      <category term="编程" scheme="https://bluerbk.top/tags/%E7%BC%96%E7%A8%8B/"/>
+    
+      <category term="C#" scheme="https://bluerbk.top/tags/C/"/>
+    
+      <category term="dotnet" scheme="https://bluerbk.top/tags/dotnet/"/>
+    
+      <category term="Microsoft" scheme="https://bluerbk.top/tags/Microsoft/"/>
+    
+      <category term="网络编程" scheme="https://bluerbk.top/tags/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/"/>
+    
+  </entry>
   
   <entry>
     <title>C#基础伪教程（六）SQL数据库访问及线程操作</title>
@@ -200,11 +263,11 @@
     
       <category term="编程" scheme="https://bluerbk.top/tags/%E7%BC%96%E7%A8%8B/"/>
     
+      <category term="网络编程" scheme="https://bluerbk.top/tags/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/"/>
+    
       <category term="Java" scheme="https://bluerbk.top/tags/Java/"/>
     
       <category term="Socket" scheme="https://bluerbk.top/tags/Socket/"/>
-    
-      <category term="网络编程" scheme="https://bluerbk.top/tags/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/"/>
     
       <category term="多线程" scheme="https://bluerbk.top/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/"/>
     

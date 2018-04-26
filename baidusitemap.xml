@@ -4,6 +4,58 @@
 
     
   <url>
+    <loc>https://bluerbk.top/2018/04/26/Python-WebBug-First/</loc>
+    <lastmod>2018-04-26T15:12:30.640Z</lastmod>
+    <data>
+        <display>
+        <title>Python从入门到放弃：利用爬虫抓取文字和图片</title>
+        <pubTime>2018-04-26T11:05:51.000Z</pubTime>
+        
+        <tag>编程</tag>
+         
+        <tag>Python</tag>
+         
+        <tag>网络爬虫</tag>
+         
+         
+           
+             
+              <breadCrumb title="Python" url="https://bluerbk.top/categories/Python/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://bluerbk.top/2018/04/24/CSharp-Seventh-NetConnection/</loc>
+    <lastmod>2018-04-24T15:11:21.234Z</lastmod>
+    <data>
+        <display>
+        <title>C#基础伪教程（五）网络编程</title>
+        <pubTime>2018-04-24T14:59:42.000Z</pubTime>
+        
+        <tag>编程</tag>
+         
+        <tag>C#</tag>
+         
+        <tag>dotnet</tag>
+         
+        <tag>Microsoft</tag>
+         
+        <tag>网络编程</tag>
+         
+         
+           
+             
+              <breadCrumb title="C#" url="https://bluerbk.top/categories/C/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>https://bluerbk.top/2018/04/24/CSharp-Sixth-SQLCon/</loc>
     <lastmod>2018-04-24T11:21:01.443Z</lastmod>
     <data>
@@ -162,11 +214,11 @@
         
         <tag>编程</tag>
          
+        <tag>网络编程</tag>
+         
         <tag>Java</tag>
          
         <tag>Socket</tag>
-         
-        <tag>网络编程</tag>
          
         <tag>多线程</tag>
          
