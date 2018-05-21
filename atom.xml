@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://bluerbk.top/"/>
-  <updated>2018-04-26T15:12:30.640Z</updated>
+  <updated>2018-05-21T15:42:05.770Z</updated>
   <id>https://bluerbk.top/</id>
   
   <author>
@@ -15,6 +15,40 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>C#从入门到放弃 - 魔塔</title>
+    <link href="https://bluerbk.top/2018/05/21/Game-MoTa/"/>
+    <id>https://bluerbk.top/2018/05/21/Game-MoTa/</id>
+    <published>2018-05-21T13:56:32.000Z</published>
+    <updated>2018-05-21T15:42:05.770Z</updated>
+    
+    <content type="html"><![CDATA[<p>关于项目的开发具体也不多说吧，主要说一下具体思路和碰到的问题，简单的就这么放上来了，难的项目再放具体实例。</p><h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>主要是在B站上看到了C++版本的魔塔视频，勾起了这个游戏的回忆，但是又不想去学习C++，就在网上搜了一下C#版本的，果然不少，我找了一些代码看了卡，借鉴了一下，再糅合一些元素，写出了我的魔塔。<br>我就是不放图，自己脑补吧。</p><h3 id="关于魔塔"><a href="#关于魔塔" class="headerlink" title="关于魔塔"></a>关于魔塔</h3><p>《魔塔》是一种策略类的固定数值RPG游戏。游戏需要动很多脑筋，任何一个轻率的选择都可能导致游戏的失败。魔塔游戏虽不大，但是制作精美，道具很多，而且难度不低，对智商是一次艰巨的考验。</p><h2 id="思路设计"><a href="#思路设计" class="headerlink" title="思路设计"></a>思路设计</h2><p>从简介里可以看出啦，这个游戏的逻辑还是很简单的，而且界面设计是类似像素风的，主界面也是一格一格，这就相对更好设计了。主界面采用PictureBox控件，这个空间可以设置BackGroundImage和Image两个属性，后者可以覆盖前者，可以让地面和墙作为背景，怪物和物品等放在前景。<br>地图我的是13x13的，背景和怪物分别为13x13的二维数组，算上楼层，构成三维数组。数组中可以最简单的直接采用string类型，直接保存图片的地址，但这样很不好判断什么图形是什么物体，我采用了类，分为怪物物品类和背景类，分别具有不同的属性，比如怪物物品类具有攻击力，防御力等数值，至于我为什么把这两个不相关的东西放在一起，因为我还不太懂继承的一些东西，分成两个类不太好写数组类型，所以就只能这样了，共同属性也有，比如ID，名称，图片路径等，后面可以通过ID判定这个物体是什么东西，简化了判断的过程。<br>角色的移动、打怪、捡物品及开门等操作，即对PictureBox.Image进行操作，比如角色移动，先将这个PictureBox.Image=null，再对角色下一个位置的PictureBox.Image=cp.Image，即可完成角色的移动。<br>关于角色的移动，先判定是否有路，也就是不撞墙，可以通过判定PictureBox的背景Image，如果为Ground就可以走，然后再进行Image的判定，进行相关动作。<br>采用模块化编程思想，将楼层信息，主体信息，角色信息等分为不同的类进行编写，可以采用静态类读取内容，也可以实例化一个类，通过参数的传入进行各种操作。<br>答题逻辑就是这些，下面说一下注意事项和碰到的问题。</p><h2 id="bulabula"><a href="#bulabula" class="headerlink" title="bulabula"></a>bulabula</h2><p>首先，可以重写Form_Load方法，这个方法和Init方法不一样，后者是在初始化的时候进行的操作，比如变量赋值等，但是如果是对界面进行某个操作可能出现报错等问题，因为初始化阶段界面可能还没有加载好，如果想要设置界面的图形之类的，可以考虑将其加在前者重写中，当然初始化也可以，只不过可能会随缘报错。<br>其次，可以在Form_Load重写方法中设置窗口打开的大小，比如我们在编写的过程中需要显示胜利的界面狂，在这里我还是采用的PictureBox，没有地方放，我不得已把屏幕拉宽了，即便设置PictureBox的Visible，运行了还是宽边，这时候就可以重写加载函数，重新编辑窗口大小即可。<br>使用Thread.Sleep函数的时候，PictureBox.Image的动态设置不会生效，至于为什么，我没有查到具体的内容，不过我想可能是和缓冲区什么的有关吧，因为在休眠之后才会执行休眠之前的内容，可能和流的传输一样，需要刷新等操作将数据挤出流进行立刻传输。在此，只需要刷新一下PictureBox.Refresh即可，然后进行休眠操作，这时候就可以动态显示PictureBox的图像了。<br>我想想还有什么，ammmmmm好像就这些吧，具体还有的话想到了再补充吧。就这样，散了散了。<br>下一步准备写玩玩java的模拟web操作，登陆啊，点击啊什么的，然后有空了好好看看C# 的网络编程，我那个文章写了个开头一直没动，就这样。</p><hr><h2 id="OK-Bye"><a href="#OK-Bye" class="headerlink" title="OK,Bye"></a>OK,Bye</h2>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;关于项目的开发具体也不多说吧，主要说一下具体思路和碰到的问题，简单的就这么放上来了，难的项目再放具体实例。&lt;/p&gt;
+&lt;h2 id=&quot;简介&quot;&gt;&lt;a href=&quot;#简介&quot; class=&quot;headerlink&quot; title=&quot;简介&quot;&gt;&lt;/a&gt;简介&lt;/h2&gt;&lt;p&gt;主要是在B站上看到
+      
+    
+    </summary>
+    
+      <category term="C#" scheme="https://bluerbk.top/categories/C/"/>
+    
+    
+      <category term="编程" scheme="https://bluerbk.top/tags/%E7%BC%96%E7%A8%8B/"/>
+    
+      <category term="C#" scheme="https://bluerbk.top/tags/C/"/>
+    
+      <category term="Microsoft" scheme="https://bluerbk.top/tags/Microsoft/"/>
+    
+      <category term="项目开发" scheme="https://bluerbk.top/tags/%E9%A1%B9%E7%9B%AE%E5%BC%80%E5%8F%91/"/>
+    
+      <category term="游戏开发" scheme="https://bluerbk.top/tags/%E6%B8%B8%E6%88%8F%E5%BC%80%E5%8F%91/"/>
+    
+  </entry>
   
   <entry>
     <title>Python从入门到放弃：利用爬虫抓取文字和图片</title>
