@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://bluerbk.top/"/>
-  <updated>2018-05-21T15:42:05.770Z</updated>
+  <updated>2018-05-25T06:15:07.705Z</updated>
   <id>https://bluerbk.top/</id>
   
   <author>
@@ -15,6 +15,74 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>C#GUI使用小教程：事件和委托</title>
+    <link href="https://bluerbk.top/2018/05/24/CSharp-SmallTip-TwoFormConnect/"/>
+    <id>https://bluerbk.top/2018/05/24/CSharp-SmallTip-TwoFormConnect/</id>
+    <published>2018-05-24T09:08:54.000Z</published>
+    <updated>2018-05-25T06:15:07.705Z</updated>
+    
+    <content type="html"><![CDATA[<p>之前在写GUI的时候发现这么一个问题，我不可能把所有东西都写在一个界面里吧，那么，我怎么通过在这个界面改变另一个界面的东西呢？比如我点击按钮，另一个界面的图片就会改变。</p><p>这个问题困扰了两个礼拜，在此期间我百度了各种，最终找到了方法，使用事件和委托，但是不知道为什么百度几乎所有文章都把这个东西讲的很难，然后我找啊找，找到了一个小视频，只有十分钟，但是能解决这个鬼问题。</p><h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>新东西还是得先扯概念，虽然我不喜欢，而且我是从别的地方复制来的。</p><h3 id="Delegate"><a href="#Delegate" class="headerlink" title="Delegate"></a>Delegate</h3><p>delegate是C#中的一种类型，它实际上是一个能够持有对某个方法的引用的类。与其它的类不同，delegate类能够拥有一个签名（signature），并且它”只能持有与它的签名相匹配的方法的引用”。它所实现的功能与C/C++中的函数指针十分相似。它允许你传递一个类A的方法m给另一个类B的对象，使得类B的对象能够调用这个方法m。但与函数指针相比，delegate有许多函数委托和事件在 .Net Framework中的应用非常广泛指针不具备的优点。首先，函数指针只能指向静态函数，而delegate既可以引用静态函数，又可以引用非静态成员函数。在引用非静态成员函数时，delegate不但保存了对此函数入口指针的引用，而且还保存了调用此函数的类实例的引用。其次，与函数指针相比，delegate是面向对象、类型安全、可靠的受控（managed）对象。也就是说，runtime能够保证delegate指向一个有效的方法，你无须担心delegate会指向无效地址或者越界地址。</p><p>实现一个delegate是很简单的，通过以下3个步骤即可实现一个delegate：</p><ul><li>声明一个delegate对象，它应当与你想要传递的方法具有相同的参数和返回值类型。</li><li>创建delegate对象，并”将你想要传递的函数作为参数传入”。</li><li>在要实现异步调用的地方，通过上一步创建的对象来调用方法。</li></ul><p>结合delegate的实现，我们可以将自定义事件的实现归结为以下几步：</p><ul><li>定义delegate对象类型，它有两个参数，第一个参数是事件发送者对象，第二个参数是事件参数类对象。</li><li>定义事件参数类，此类应当从System.EventArgs类派生。如果事件不带参数，这一步可以省略。</li><li>定义”事件处理方法，它应当与delegate对象具有相同的参数和返回值类型”。</li><li>用event关键字定义事件对象，它同时也是一个delegate对象。</li><li>用+=操作符添加事件到事件队列中（-=操作符能够将事件从队列中删除）。</li><li>在需要触发事件的地方用调用delegate的方式写事件触发方法。一般来说，此方法应为protected访问限制，既不能以public方式调用，但可以被子类继承。名字是OnEventName。</li><li>在适当的地方调用事件触发方法触发事件。</li></ul><p>概念总算复制完了，其实我一个字都没看。</p><h2 id="具体实现"><a href="#具体实现" class="headerlink" title="具体实现"></a>具体实现</h2><p>这才是需要关心的地方。<br>先说明一下背景，点击Form2的按钮，修改Form1的Label的文本内容，就这个简单的功能。<br>首先在Form2.cs的类中，方法外，定义一个委托，然后创建一个事件。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">public delegate void Change();</span><br><span class="line">public event Change MyChangeEvent;</span><br></pre></td></tr></table></figure></p><p>然后在Form2的触发方法（比如按钮的Click事件）中，触发事件。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">private void ChangeButton_Click(object sender, EventArgs e)</span><br><span class="line">        &#123;</span><br><span class="line">            //触发时间，在哪里注册了就会在哪里执行。</span><br><span class="line">//这个注释什么意思我也忘了，留着吧，万一啥时候想起了</span><br><span class="line">            MyChangeEvent();</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure></p><p>现在事件就定义完成了，回到Form1中，在触发方法（比如按钮的Click事件）中，注册事件，即绑定一个方法。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">private void NewButton_Click(object sender, EventArgs e)</span><br><span class="line">        &#123;</span><br><span class="line">            Form2 f2 = new Form2();</span><br><span class="line">            //注册事件即绑定一个方法</span><br><span class="line">            f2.MyChangeEvent += f2_MyChangeEvent;</span><br><span class="line">            f2.Show();</span><br><span class="line">        &#125;</span><br><span class="line">void f2_MyChangeEvent()</span><br><span class="line">        &#123;</span><br><span class="line">            //只要事件被触发，就执行这里的代码</span><br><span class="line">            label.Text = &quot;成功了&quot;;</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure></p><p>使用+=绑定方法，至此这个简单的技巧就说完了。<br>这一段代码意思是点击按钮之后打开一个新窗口，同时注册这个这个方法，将其绑定给Form2的事件，点击Form2的按钮后就执行了代码了。</p><h2 id="这个方法不止Winform可以用，WPF跨窗体也可以用的。"><a href="#这个方法不止Winform可以用，WPF跨窗体也可以用的。" class="headerlink" title="这个方法不止Winform可以用，WPF跨窗体也可以用的。"></a>这个方法不止Winform可以用，WPF跨窗体也可以用的。</h2><h2 id="OK-THANKS-FOR-READING-BYE-BYE"><a href="#OK-THANKS-FOR-READING-BYE-BYE" class="headerlink" title="OK,THANKS FOR READING.BYE BYE~"></a>OK,THANKS FOR READING.BYE BYE~</h2>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;之前在写GUI的时候发现这么一个问题，我不可能把所有东西都写在一个界面里吧，那么，我怎么通过在这个界面改变另一个界面的东西呢？比如我点击按钮，另一个界面的图片就会改变。&lt;/p&gt;
+&lt;p&gt;这个问题困扰了两个礼拜，在此期间我百度了各种，最终找到了方法，使用事件和委托，但是不知道为
+      
+    
+    </summary>
+    
+      <category term="C#" scheme="https://bluerbk.top/categories/C/"/>
+    
+    
+      <category term="编程" scheme="https://bluerbk.top/tags/%E7%BC%96%E7%A8%8B/"/>
+    
+      <category term="C#" scheme="https://bluerbk.top/tags/C/"/>
+    
+      <category term="dotnet" scheme="https://bluerbk.top/tags/dotnet/"/>
+    
+      <category term="Microsoft" scheme="https://bluerbk.top/tags/Microsoft/"/>
+    
+      <category term="事件委托" scheme="https://bluerbk.top/tags/%E4%BA%8B%E4%BB%B6%E5%A7%94%E6%89%98/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>C#从入门到放弃：Socket</title>
+    <link href="https://bluerbk.top/2018/05/24/CSharp-Seventh-NetConnection/"/>
+    <id>https://bluerbk.top/2018/05/24/CSharp-Seventh-NetConnection/</id>
+    <published>2018-05-24T08:23:42.000Z</published>
+    <updated>2018-05-25T06:19:04.636Z</updated>
+    
+    <content type="html"><![CDATA[<p>高产似那啥。似个毛啊，这个文章是我上个月就要发的，然而拖了一个月，一直都有其他事，现在才空出来写这个。<br>其实这个不用重点介绍概念什么的了，想起来之前写过java的Socket的文章，我的微信公众号也有个Java的Socket，可以把这几个文章结合起来看。</p><p>网络编程有UDP啊，TCP啊，喜闻乐见的Socket啊什么的，打算把这些都搞一下，以前一直用java的Socket，也用了Socket在Java和C#发送消息。<br>写着鬼玩意都睡着了还给。</p><h2 id="Socket"><a href="#Socket" class="headerlink" title="Socket"></a>Socket</h2><p>socket非常类似于电话插座。以一个电话网为例：电话的通话双方相当于相互通信的2个程序，电话号码就是ip地址。任何用户在通话之前，首先要占有一部电话机，相当于申请一个socket；同时要知道对方的号码，相当于对方有一个固定的socket。然后向对方拨号呼叫，相当于发出连接请求。对方假如在场并空闲，拿起电话话筒，双方就可以正式通话，相当于连接成功。双方通话的过程，是一方向电话机发出信号和对方从电话机接收信号的过程，相当于向socket发送数据和从socket接收数据。通话结束后，一方挂起电话机相当于关闭socket，撤销连接。<br>套接字分类</p><ul><li>流式套接字（SOCK_STREAM）：提供了一种可靠的、面向连接的双向数据传输服务。实现了数据无差错，无重复的发送，内设流量控制，被传输的数据被看做无记录边界的字节流。在TCP/IP协议簇中，使用TCP实现字节流的传输，当用户要发送大批量数据，或对数据传输的可靠性有较高要求时使用流式套接字。</li><li>数据报套接字（SOCK_DGRAM）：提供了一种无连接、不可靠的双向数据传输服务。数据以独立的包形式被发送，并且保留了记录边界，不提供可靠性保证。数据在传输过程中可能会丢失或重复，并且不能保证在接收端数据按发送顺序接收。在TCP/IP协议簇中，使用UDP实现数据报套接字。</li><li>原始套接字（SOCK_RAW）：该套接字允许对较低层协议（如IP或ICMP）进行直接访问。一般用于对TCP/IP核心协议的网络编程。<h4 id="上面都是啥我忘了，上次写的时候不知道从哪抄的了，不管了，直入主题"><a href="#上面都是啥我忘了，上次写的时候不知道从哪抄的了，不管了，直入主题" class="headerlink" title="上面都是啥我忘了，上次写的时候不知道从哪抄的了，不管了，直入主题"></a>上面都是啥我忘了，上次写的时候不知道从哪抄的了，不管了，直入主题</h4></li></ul><h2 id="客户端"><a href="#客户端" class="headerlink" title="客户端"></a>客户端</h2><h3 id="连接"><a href="#连接" class="headerlink" title="连接"></a>连接</h3><p>连接老规矩，需要构造一个“连接字符串”，这里需要一个IP地址和一些Socket的参数好像，如下，需要使用IPAddress构造一个IP地址。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">IPAddress ip = IPAddress.Parse(&quot;127.0.0.1&quot;);</span><br><span class="line">Socket socket = new Socket(AddressFamily.InterNetwork,SocketType.Stream, ProtocolType.Tcp);</span><br></pre></td></tr></table></figure></p><p>之后呢使用Socket.Connect()进行连接，如下，其中4000为通信的端口，0~1023是系统端口，1024~49151是注册端口，有些会绑定一些松散的服务，许多系统都从1024开始动态处理端口，如果我们通信的话把端口选择在1024之后不冲突就好了。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">socket.Connection(new IPEndPoint(ip,4000));</span><br></pre></td></tr></table></figure></p><h3 id="发送"><a href="#发送" class="headerlink" title="发送"></a>发送</h3><p>发送信息的时候采用Socket.Send()方法，SendTo()方法应该也可以，我没试过，在这里，参数是需要发送的数据的字节数组，即byte[]类型，这个方法是有返回值的，返回值为已经发送到Socket的字节数。<br>所以发送的时候需要将数据都转换为字节数组。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">//将字符串str转为UTF8格式的字节数组</span><br><span class="line">Encoding.UTF8.GetBytes(str);</span><br><span class="line">//将整型num转为字节数组</span><br><span class="line">BitConverter.GetBytes(num);</span><br></pre></td></tr></table></figure></p><p>例如一个完整的发送字符串可以为下面的代码<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">string str=&quot;name&quot;;</span><br><span class="line">byte[] data=new byte[str.Length];</span><br><span class="line">var ef=socket.Send(data);</span><br><span class="line">if (ef&lt;=0)&#123;</span><br><span class="line">Console.WriteLine(&quot;Failed&quot;);</span><br><span class="line">&#125;</span><br><span class="line">else </span><br><span class="line">Console.WriteLine(&quot;Successfully&quot;);</span><br></pre></td></tr></table></figure></p><p>相比如Java的流操作，C#的操作还是方便了很多的，全部都是对字节数组进行操作。</p><h3 id="接收"><a href="#接收" class="headerlink" title="接收"></a>接收</h3><p>接收的时候使用Socket.Receive()方法，参数为需要保存数据的字节数组，即byte[]类型，返回值为收到的Receive的字节数，如果。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">byte[] recdata=new byte[1024];</span><br><span class="line">var reff=socket.Receive(recdata);</span><br><span class="line">if (reff&lt;=0)&#123;</span><br><span class="line">Console.WriteLine(&quot;Failed&quot;);</span><br><span class="line">&#125;</span><br><span class="line">else </span><br><span class="line">Console.WriteLine(&quot;Successfully&quot;);</span><br></pre></td></tr></table></figure></p><p>这样信息就接收成功了，但是要注意，这里接收到的仍然是字节数组byte[]，需要再次转换才能成为我们需要的数据。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">//将UTF8的byte字节数组转换为字符串</span><br><span class="line">Encoding.UTF8.GetString(byte);</span><br><span class="line">//将字节数组转换为整型</span><br><span class="line">BitConverter.ToInt32(byte);</span><br></pre></td></tr></table></figure></p><p>这样才能得到我们真正需要的。</p><h2 id="有点坑"><a href="#有点坑" class="headerlink" title="有点坑"></a>有点坑</h2><p>大致的操作就是这些，其实也没什么难的。只要就是一些细节。<br>比如在连续Send的时候，接收端可能会出现接收错误的情况，至于为什么我归结于缓冲区的问题，Java我也碰到过，不过java的流操作可以使用flush()清空缓冲区，C#我似乎没有找到，只能采取最差的方法，对每一个Send接收端也返回一个Send，作为反馈，多线程的非阻塞情况下会不会出现这个问题我还需要再试试。</p><h2 id="OK-THANKS-FOR-READING-BYE-BYE"><a href="#OK-THANKS-FOR-READING-BYE-BYE" class="headerlink" title="OK,THANKS FOR READING.BYE BYE~"></a>OK,THANKS FOR READING.BYE BYE~</h2>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;高产似那啥。似个毛啊，这个文章是我上个月就要发的，然而拖了一个月，一直都有其他事，现在才空出来写这个。&lt;br&gt;其实这个不用重点介绍概念什么的了，想起来之前写过java的Socket的文章，我的微信公众号也有个Java的Socket，可以把这几个文章结合起来看。&lt;/p&gt;
+&lt;p
+      
+    
+    </summary>
+    
+      <category term="C#" scheme="https://bluerbk.top/categories/C/"/>
+    
+    
+      <category term="编程" scheme="https://bluerbk.top/tags/%E7%BC%96%E7%A8%8B/"/>
+    
+      <category term="C#" scheme="https://bluerbk.top/tags/C/"/>
+    
+      <category term="dotnet" scheme="https://bluerbk.top/tags/dotnet/"/>
+    
+      <category term="Microsoft" scheme="https://bluerbk.top/tags/Microsoft/"/>
+    
+      <category term="网络编程" scheme="https://bluerbk.top/tags/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/"/>
+    
+  </entry>
   
   <entry>
     <title>C#从入门到放弃 - 魔塔</title>
@@ -76,40 +144,6 @@
       <category term="Python" scheme="https://bluerbk.top/tags/Python/"/>
     
       <category term="网络爬虫" scheme="https://bluerbk.top/tags/%E7%BD%91%E7%BB%9C%E7%88%AC%E8%99%AB/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>C#基础伪教程（五）网络编程</title>
-    <link href="https://bluerbk.top/2018/04/24/CSharp-Seventh-NetConnection/"/>
-    <id>https://bluerbk.top/2018/04/24/CSharp-Seventh-NetConnection/</id>
-    <published>2018-04-24T14:59:42.000Z</published>
-    <updated>2018-04-24T15:11:21.234Z</updated>
-    
-    <content type="html"><![CDATA[<p>高产似那啥，今天可能出不来这个文章了，明天发吧。<br>其实这个不用重点介绍概念什么的了，突然想起来之前写过java的网络编程，可以把这两个文章结合起来看。最后写一个实例是Java和C#进行通信的例子，有GUI的。</p><p>网络编程有UDP啊，TCP啊，喜闻乐见的Socket啊什么的，打算把这些都搞一下，以前一直用java的Socket，也用Socket在Java和C#发送消息，看了看好像C#的TCP不难，那就试试吧，都可以给一个实例的，是实例不是示例。</p><h2 id="Socket"><a href="#Socket" class="headerlink" title="Socket"></a>Socket</h2><p>socket非常类似于电话插座。以一个电话网为例：电话的通话双方相当于相互通信的2个程序，电话号码就是ip地址。任何用户在通话之前，首先要占有一部电话机，相当于申请一个socket；同时要知道对方的号码，相当于对方有一个固定的socket。然后向对方拨号呼叫，相当于发出连接请求。对方假如在场并空闲，拿起电话话筒，双方就可以正式通话，相当于连接成功。双方通话的过程，是一方向电话机发出信号和对方从电话机接收信号的过程，相当于向socket发送数据和从socket接收数据。通话结束后，一方挂起电话机相当于关闭socket，撤销连接。<br>套接字分类</p><ul><li>流式套接字（SOCK_STREAM）：提供了一种可靠的、面向连接的双向数据传输服务。实现了数据无差错，无重复的发送，内设流量控制，被传输的数据被看做无记录边界的字节流。在TCP/IP协议簇中，使用TCP实现字节流的传输，当用户要发送大批量数据，或对数据传输的可靠性有较高要求时使用流式套接字。</li><li>数据报套接字（SOCK_DGRAM）：提供了一种无连接、不可靠的双向数据传输服务。数据以独立的包形式被发送，并且保留了记录边界，不提供可靠性保证。数据在传输过程中可能会丢失或重复，并且不能保证在接收端数据按发送顺序接收。在TCP/IP协议簇中，使用UDP实现数据报套接字。</li><li>原始套接字（SOCK_RAW）：该套接字允许对较低层协议（如IP或ICMP）进行直接访问。一般用于对TCP/IP核心协议的网络编程。</li></ul>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;p&gt;高产似那啥，今天可能出不来这个文章了，明天发吧。&lt;br&gt;其实这个不用重点介绍概念什么的了，突然想起来之前写过java的网络编程，可以把这两个文章结合起来看。最后写一个实例是Java和C#进行通信的例子，有GUI的。&lt;/p&gt;
-&lt;p&gt;网络编程有UDP啊，TCP啊，喜闻乐见的So
-      
-    
-    </summary>
-    
-      <category term="C#" scheme="https://bluerbk.top/categories/C/"/>
-    
-    
-      <category term="编程" scheme="https://bluerbk.top/tags/%E7%BC%96%E7%A8%8B/"/>
-    
-      <category term="C#" scheme="https://bluerbk.top/tags/C/"/>
-    
-      <category term="dotnet" scheme="https://bluerbk.top/tags/dotnet/"/>
-    
-      <category term="Microsoft" scheme="https://bluerbk.top/tags/Microsoft/"/>
-    
-      <category term="网络编程" scheme="https://bluerbk.top/tags/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/"/>
     
   </entry>
   
